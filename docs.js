@@ -54,6 +54,10 @@
         'n': 'Natural logarithm of `a`',
         's': '`a` in lower case'
     },
+    'S': {
+        's': 'Sorted characters of `a`',
+        'a': 'Sotered elements of `a`'
+    },
     'T': {
         's': 'Each word of `a` capitalized'
     },
@@ -75,6 +79,9 @@
     },
     'Z': {
         '': 'Set to `z`'
+    },
+    '\\': {
+        '?': 'Map `a`'
     },
     ']': {
         '?': 'Array containing just `a`'

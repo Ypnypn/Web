@@ -18,7 +18,10 @@
             <button id="run">Run</button>
         </div>
         <h2>Output</h2>
-        <textarea id="output" rows="4" cols="60" disabled></textarea>
+        <footer>
+            <textarea id="output" rows="4" cols="60" readonly></textarea>
+            <a href="tests.html">Test LangName on your browser</a>
+        </footer>
     </div>
     <div style="width: 50%; float: right">
         <div id="buttons"></div>
@@ -44,18 +47,18 @@
                 const symbolData = documentation[ch];
                 if (symbolData) {
                     const arity = arities[ch] % 100 || 0;
-                    $("#symbolName").text(
-                        'abcdefghij'.slice(0, arity) +
-                        ch +
-                        (arities[ch] >= 200 ?
-                            '...)' :
-                            ch === '`' ?
-                                '...`' :
-                                    ch === '\'' ?
-                                        '.' :
-                                        ''
-                        )
-                    );
+
+                    var symbolTitle = 'abcdefghij'.slice(0, arity) + ch;
+                    if (arities[ch] >= 200)
+                        symbolTitle += '...)';
+                    if (ch === '`')
+                        symbolTitle += '...`';
+                    if (ch === '\'')
+                        symbolTitle += '.';
+                    if (ch >= 'V' && ch <= 'Z')
+                        symbolTitle = 'a' + symbolTitle;
+                    $("#symbolName").text(symbolTitle);
+
                     for (var i = 0; i < arity; i++) {
                         $("<th>").text('abcdefghij'[i]).appendTo("#docHeaderRow");
                     }
@@ -119,18 +122,22 @@
         }
 
         h1 {
-            font-size: 26px;
+            font-size: 28px;
             margin: 6px 4px 8px;
         }
 
         h2 {
-            font-size: 20px;
+            font-size: 22px;
             margin: 4px;
         }
 
         textarea, button {
             font-family: Consolas, monospace;
         }
+
+            textarea#output {
+                background-color: #EEEEEE;
+            }
 
         table {
             margin: 0 auto;
@@ -153,11 +160,11 @@
         }
 
             #doc > div {
-                margin: 5px;
+                margin: 25px 5px 10px;
             }
 
         #symbolName {
-            font-size: 20px;
+            font-size: 22px;
             font-family: Consolas, monospace;
             background-color: #DDDDDD;
         }

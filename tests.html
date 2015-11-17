@@ -27,10 +27,10 @@
         var passed = testResults.passed;
         var failed = testResults.failed;
         if (failed.length === 0) {
-            $("#summary").text('All ' + test_s(passed) + ' passed!');
+            $("#summary").html('All ' + test_s(passed) + ' passed!');
             $("#result").hide();
         } else {
-            $("#summary").text(test_s(passed) + ' passed. ' + test_s(failed) + ' failed.');
+            $("#summary").html(test_s(passed) + ' passed. ' + test_s(failed) + ' failed.');
             failed.forEach(function (test) {
                 var $tr = $("<tr>");
                 $("<td>").text(test.test).appendTo($tr);
