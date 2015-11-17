@@ -44,7 +44,18 @@
                 const symbolData = documentation[ch];
                 if (symbolData) {
                     const arity = arities[ch] % 100 || 0;
-                    $("#symbolName").text('abcdefghij'.slice(0, arity) + ch + (arities[ch] >= 200 ? '...)' : ''));
+                    $("#symbolName").text(
+                        'abcdefghij'.slice(0, arity) +
+                        ch +
+                        (arities[ch] >= 200 ?
+                            '...)' :
+                            ch === '`' ?
+                                '...`' :
+                                    ch === '\'' ?
+                                        '.' :
+                                        ''
+                        )
+                    );
                     for (var i = 0; i < arity; i++) {
                         $("<th>").text('abcdefghij'[i]).appendTo("#docHeaderRow");
                     }
@@ -87,17 +98,11 @@
             $("#run").prop("disabled", false);
         });
 
-        function stringify(val) {
-            if (Array.isArray(val))
-                return `(${val.map(stringify).join(' ')})`;
-            return val + '';
-        }
-
         function checkCodeValid(code) {
             var output = '';
             for (var c of code) {
                 if (allLangNameChars.indexOf(c) === -1) {
-                    output += `Contains illegal character: ${c}\n`;
+                    output += `Contains illegal character: '${c}'\n`;
                 }
             }
             if (output.length !== 0) {
@@ -145,7 +150,6 @@
         #doc {
             width: 100%;
             text-align: center;
-            margin: 15px;
         }
 
             #doc > div {

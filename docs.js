@@ -1,7 +1,16 @@
 ﻿const documentation = {
+    '!': {
+        'n': 'Factorial of `a`',
+        's': 'Permutations of `a`',
+        'a': 'Permutations of `a`'
+    },
     '&': {
         'nn': 'Bitwise-and of `a` and `b`',
+        'ss': 'Intersection of `a` and `b`, in order of appearance in `a`',
         'aa': 'Intersection of `a` and `b`, in order of appearance in `a`'
+    },
+    '\'': {
+        '': 'Single-character string'
     },
     '(': {
         '': 'Collect in array'
@@ -23,6 +32,9 @@
         'nn': '`a` divided by `b`, truncated to integer',
         'ss': '`a` split by `b`'
     },
+    ':': {
+        '??': 'Execute for each of `a` and `b`, and wrap in array'
+    },
     '<': {
         '??': '`a` is less than `b`'
     },
@@ -36,7 +48,14 @@
         '???': 'If `a`, then `b`, else `c`'
     },
     '@': {
-         '?': 'Execute for each of `a`'
+        '?': 'Execute for each of `a`'
+    },
+    'L': {
+        'n': 'Natural logarithm of `a`',
+        's': '`a` in lower case'
+    },
+    'T': {
+        's': 'Each word of `a` capitalized'
     },
     'U': {
         'n': 'Integers from 1 (inclusive) to `a` (inclusive)',
@@ -60,12 +79,24 @@
     ']': {
         '?': 'Array containing just `a`'
     },
-    'i': {
-        '': 'Read one character from input'
+    '^': {
+        'nn': 'Bitwise-xor of `a` and `b`',
+        'ss': 'Characters of `a` not in `b`, then characters of `b` not in `a`',
+        'aa': 'Elements of `a` not in `b`, then elements of `b` not in `a`'
+    },
+    '`': {
+        '': 'String literal, with `\\` used to escape'
     },
     'g': {
-        'sn': 'The `a`\'th character of `b`',
-        'an': 'The `a`\'th element of `b`'
+        'sn': 'The `b`\'th character of `a`',
+        'an': 'The `b`\'th element of `a`'
+    },
+    'h': {
+        'n': '`a` in hexadecimal',
+        's': '`a`, treated as hexacidemal'
+    },
+    'i': {
+        '': 'Read one character from input'
     },
     'l': {
         '': 'Read one line from input'
@@ -73,8 +104,17 @@
     'r': {
         '': 'Read entire input'
     },
+    's': {
+        'nnn': 'Numbers from `a` (inclusive) to `b` (inclusive), with a step of `c`',
+        'nns': 'Characters from index `a` (inclusive) to `b` (exclusive) of `c`',
+        'nna': 'Elements from index `a` (inclusive) to `b` (exclusive) of `c`',
+        'sn?': '`a`, with the `b`\'th character replaced with `c`',
+        'sss': '`b`, with each `a` replaced with `c`',
+        'an?': '`a`, with the `b`\'th element replaced with `c`',
+        '?a?': '`b`, with each `a` replaced with `c`'
+    },
     't': {
-        's': 'Each word of `a` capitalized',
+        's': '`a` with leading and trailing whitespace removed',
         'a': '`a` transposed'
     },
     'u': {
@@ -99,10 +139,13 @@
     },
     '|': {
         'nn': 'Bitwise-or of `a` and `b`',
+        'ss': 'Union of `a` and `b`, in the order of `a` followed by remaining characters of `b`',
         'aa': 'Union of `a` and `b`, in the order of `a` followed by remaining elements of `b`'
     },
     '~': {
-        'n': 'Bitwise-not of `a`'
+        'n': 'Bitwise-not of `a`',
+        's': 'Length of `a`',
+        'a': 'Length of `a`'
     },
     '«': {
         'nn': '`a` shifted left by `b`',
@@ -123,6 +166,9 @@
     'Σ': {
         'a': 'Sum of elements of `a`'
     },
+    'π': {
+        '': 'Pi'
+    },
     '˄': {
         '?': 'If `a` is false, leave on stack; otherwise, execute'
     },
@@ -134,6 +180,22 @@
     },
     '‴': {
         '?': 'Three copies of `a`'
+    },
+    '₁': {
+        '': 'If preceded by a numeral, begin a new number starting with 1; otherwise, remove top of stack'
+    },
+    '₂': {
+        '': 'If preceded by a numeral, begin a new number starting with 2; otherwise, remove second-to-top of stack'
+    },
+    '↑': {
+        'n': '`a` plus one',
+        's': 'First character of `a`',
+        'a': 'First element of `a`'
+    },
+    '↓': {
+        'n': '`a` minus one',
+        's': 'Last character of `a`',
+        'a': 'Last element of `a`'
     },
     '↔': {
         '??': '`b`, then `a`'
