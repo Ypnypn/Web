@@ -374,6 +374,55 @@ window.interpretLangName = (function () {
                     ret += first;
                 return ret;
             },
+            'o': function(a) {
+                if (typeof (a) === 'number')
+                    return String.fromCharCode(a);
+                if (typeof (a) === 'string')
+                    return a.charCodeAt(0);
+            },
+            'p': function (a) {
+                if (typeof (a) === 'number') {
+                    var num = Math.abs(a | 0);
+                    if (num < 2)
+                        return [a | 0];
+                    var factors = a === num ? [] : [-1];
+                    for (var prime of[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]) {
+                        while (num % prime === 0) {
+                            factors.push(prime);
+                            num /= prime;
+                        }
+                        if (num === 1)
+                            return factors;
+                    }
+                    for (var divisor = 101; divisor * divisor <= num; divisor += 2) {
+                        while (num % divisor === 0) {
+                            factors.push(divisor);
+                            num /= divisor;
+                        }
+                    }
+                    if (num === 1)
+                        return factors;
+                    factors.push(num);
+                    return factors;
+                }
+                if (typeof (a) === 'string') {
+                    var arr = [...a];
+                    var resultSize = 1 << a.length;
+                    var result = Array(resultSize);
+                    for (var i = 0; i < resultSize; i++) {
+                        result[i] = arr.filter((c, j) => (1 << j) & i).join('');
+                    }
+                    return result;
+                }
+                if (Array.isArray(a)) {
+                    var resultSize = 1 << a.length;
+                    var result = Array(resultSize);
+                    for (var i = 0; i < resultSize; i++) {
+                        result[i] = a.filter((e, j) => (1 << j) & i);
+                    }
+                    return result;
+                }
+            },
             'r': function () {
                 var ret = '';
                 var first;
@@ -663,6 +712,19 @@ window.interpretLangName = (function () {
                 var result = stack.splice(stack.length - size, size);
                 stack.push(result);
             },
+            '§': function (go) {
+                var arg = stack.pop();
+                var arr = [...arg];
+                var vals = [];
+                for (var val of arr) {
+                    stack.push(val);
+                    go();
+                    vals.push([val, stack.pop()]);
+                }
+                vals.sort((a, b) => compare(a[1], b[1]));
+                var res = vals.map(e => e[0]);
+                stack.push(typeof (arg) === 'string' ? res.join('') : res);
+            },
             '˄': function (go) {
                 var arg = stack.pop();
                 if (truthy(arg))
@@ -676,7 +738,8 @@ window.interpretLangName = (function () {
                     go();
                 else
                     stack.push(arg);
-            }, '∫': function (go) {
+            },
+            '∫': function (go) {
                 var arg = stack.pop();
                 var arr = [...iterate(arg)];
                 if (arr.length !== 0) {
@@ -739,7 +802,7 @@ window.interpretLangName = (function () {
 
 const allLangNameChars =
     '\n !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~' +
-    '«¬»÷Σπ˄˅″‴₁₂↑↓↔↕↨∫≠≤≥⌐';
+    '§«¬»÷Σπ˄˅″‴₁₂↑↓↔↕↨∫≠≤≥⌐';
 
 const arities = {
     '!': 1,
@@ -766,12 +829,15 @@ const arities = {
     'h': 1,
     'i': 0,
     'l': 0,
+    'o': 1,
+    'p': 1,
     'r': 0,
     's': 3,
     't': 1,
     'u': 1,
     '|': 2,
     '~': 1,
+    '§': 201,
     '«': 2,
     '¬': 1,
     '»': 2,

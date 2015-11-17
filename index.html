@@ -10,7 +10,13 @@
 <body>
     <div style="width: 50%; float: left">
         <h1>LangName Interpreter</h1>
-        <h2>Code - <span id="size">0 bytes</span></h2>
+        <div style="width: 50%; float: left">
+            <h2>Code - <span id="size">0 bytes</span></h2>
+        </div>
+    <div style="width: 50%; float: right">
+        <label for="fileUpload">Upload .langname file</label>
+        </div>
+        <input type="file" id="fileUpload" accept=".langname" />
         <textarea id="code" rows="4" cols="60"></textarea>
         <h2>Input</h2>
         <textarea id="input" rows="4" cols="60"></textarea>
@@ -18,10 +24,7 @@
             <button id="run">Run</button>
         </div>
         <h2>Output</h2>
-        <footer>
-            <textarea id="output" rows="4" cols="60" readonly></textarea>
-            <a href="tests.html">Test LangName on your browser</a>
-        </footer>
+        <textarea id="output" rows="4" cols="60" readonly></textarea>
     </div>
     <div style="width: 50%; float: right">
         <div id="buttons"></div>
@@ -35,6 +38,9 @@
             </table>
         </div>
     </div>
+    <footer>
+        <a href="tests.html">Test LangName on your browser</a>
+    </footer>
     <script>
         [...allLangNameChars].forEach(function(ch) {
             $("<button>").appendTo($("#buttons")).text(ch === '\n' ? '<LF>' : ch === ' ' ? '<SP>' : ch).click(function() {
@@ -114,6 +120,17 @@
             }
             return true;
         }
+
+        $("#fileUpload").change(function(evt) {
+            var file = evt.target.files[0];
+            var reader = new FileReader();
+            reader.onloadend = function() {
+                var data = reader.result;
+                var code = [...data].map(b => allLangNameChars[b.charCodeAt(0)]).join('');
+                $("#code").val(code);
+            };
+            reader.readAsBinaryString(file);
+        });
     </script>
     <style>
         body {
@@ -167,6 +184,11 @@
             font-size: 22px;
             font-family: Consolas, monospace;
             background-color: #DDDDDD;
+        }
+
+        footer {
+            clear: both;
+            padding: 20px;
         }
     </style>
 </body>
