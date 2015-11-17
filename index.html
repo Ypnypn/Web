@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="jquery-2.1.3.min.js"></script>
+    <script src="langName.js"></script>
+    <script src="docs.js"></script>
+    <title>LangName</title>
+</head>
+<body>
+    <div style="width: 50%; float: left">
+        <h1>LangName Interpreter</h1>
+        <h2>Code - <span id="size">0 bytes</span></h2>
+        <textarea id="code" rows="4" cols="60"></textarea>
+        <h2>Input</h2>
+        <textarea id="input" rows="4" cols="60"></textarea>
+        <div>
+            <button id="run">Run</button>
+        </div>
+        <h2>Output</h2>
+        <textarea id="output" rows="4" cols="60" disabled></textarea>
+    </div>
+    <div style="width: 50%; float: right">
+        <div id="buttons"></div>
+        <div id="doc">
+            <div><span id="symbolName"></span></div>
+            <table id="docTable">
+                <thead>
+                    <tr id="docHeaderRow"></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        [...allLangNameChars].forEach(function(ch) {
+            $("<button>").appendTo($("#buttons")).text(ch === '\n' ? '<LF>' : ch === ' ' ? '<SP>' : ch).click(function() {
+                const caretPos = $("#code")[0].selectionStart;
+                const code = $("#code").val();
+                $("#code").val(code.substring(0, caretPos) + ch + code.substring(caretPos));
+                $("#code")[0].selectionStart = caretPos + 1;
+            }).mouseover(function() {
+                $("#docTable").show();
+                const symbolData = documentation[ch];
+                if (symbolData) {
+                    const arity = arities[ch] % 100 || 0;
+                    $("#symbolName").text(
+                        'abcdefghij'.slice(0, arity) +
+                        ch +
+                        (arities[ch] >= 200 ?
+                            '...)' :
+                            ch === '`' ?
+                                '...`' :
+                                    ch === '\'' ?
+                                        '.' :
+                                        ''
+                        )
+                    );
+                    for (var i = 0; i < arity; i++) {
+                        $("<th>").text('abcdefghij'[i]).appendTo("#docHeaderRow");
+                    }
+                    $("<th>").text('Description').appendTo("#docHeaderRow");
+
+                    for (var sig in symbolData) {
+                        var newRow = $("<tr>");
+                        for (var arg of sig)
+                            $("<td>").text({ '?': 'any', a: 'array', n: 'number', s: 'string' }[arg]).appendTo(newRow);
+                        $("<td>").html(symbolData[sig].replace(/`(.)`/g,'<code>$1</code>')).appendTo(newRow);
+                        newRow.appendTo("#docTable tbody");
+                    }
+                }
+            }).mouseout(function() {
+                $("#symbolName").text('');
+                $("#docHeaderRow th").remove();
+                $("#doc tbody td").remove();
+            });
+        });
+
+        setInterval(function() {
+            const codeSize = $("#code").val().length;
+            $("#size").text(codeSize + " bytes");
+        }, 200);
+
+        $("#run").prop("disabled", false);
+        $("#run").click(function() {
+            $("#run").prop("disabled", true);
+            const code = $("#code").val();
+            if (checkCodeValid(code)) {
+                const input = $("#input").val();
+                try {
+                    const result = interpretLangName(code, input);
+                    const [stack, output] = result;
+                    $("#output").val(output + stack.map(stringify).join(' '));
+                } catch (e) {
+                    $("#output").val(e.message);
+                }
+            }
+            $("#run").prop("disabled", false);
+        });
+
+        function checkCodeValid(code) {
+            var output = '';
+            for (var c of code) {
+                if (allLangNameChars.indexOf(c) === -1) {
+                    output += `Contains illegal character: '${c}'\n`;
+                }
+            }
+            if (output.length !== 0) {
+                $("#output").val(output);
+                return false;
+            }
+            return true;
+        }
+    </script>
+    <style>
+        body {
+            margin: 15px;
+            font-family: Georgia, serif;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin: 6px 4px 8px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin: 4px;
+        }
+
+        textarea, button {
+            font-family: Consolas, monospace;
+        }
+
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+
+        td, th {
+            padding: 5px;
+            border: 1px black solid;
+        }
+
+        code {
+            font-family: Consolas, monspace;
+            background-color: #DDDDDD;
+        }
+
+        #doc {
+            width: 100%;
+            text-align: center;
+        }
+
+            #doc > div {
+                margin: 5px;
+            }
+
+        #symbolName {
+            font-size: 20px;
+            font-family: Consolas, monospace;
+            background-color: #DDDDDD;
+        }
+    </style>
+</body>
+</html>
