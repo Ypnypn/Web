@@ -10,7 +10,7 @@ window.interpretLangName = (function () {
         var error = '';
         for (var c of code)
             if (allLangNameChars.indexOf(c) === -1)
-                error += `Contains illegal character: '${c}'\n`;
+            error += `Contains illegal character: '${c}'\n`;
         if (error.length !== 0)
             throw new Error(error);
 
@@ -27,13 +27,13 @@ window.interpretLangName = (function () {
 
         const stack = options.stack || [];
 
-        const vars = {
+        const vars = options.vars || {
             v: '',
             w: '\n',
             x: 10,
             y: [],
             z: ' '
-        }
+        };
 
         const forwards = {};
 
@@ -283,6 +283,18 @@ window.interpretLangName = (function () {
                     return Math.log(a);
                 if (typeof (a) === 'string')
                     return a.toLowerCase();
+            },
+            'S': function (a) {
+                if (typeof (a) === 'string') {
+                    var arr = [...a];
+                    arr.sort();
+                    return arr.join('');
+                }
+                if (Array.isArray(a)) {
+                    var ret = a.slice();
+                    ret.sort();
+                    return ret;
+                }
             },
             'T': function (a) {
                 if (typeof (a) === 'string')
@@ -624,8 +636,8 @@ window.interpretLangName = (function () {
                 stack.push(array);
             },
             '@': function (go) {
-                var arg1 = stack.pop();
-                for (var item of iterate(arg1)) {
+                var arg = stack.pop();
+                for (var item of iterate(arg)) {
                     stack.push(item);
                     go();
                 }
@@ -641,22 +653,32 @@ window.interpretLangName = (function () {
                 var result = stack.splice(stack.length - size, size);
                 stack.push(result);
             },
+            '\\': function (go) {
+                var arg = [...stack.pop()];
+                var size = arg.length;
+                for (var i = 0; i < size; i++) {
+                    stack.push(arg[i]);
+                    go();
+                }
+                var result = stack.splice(stack.length - size, size);
+                stack.push(result);
+            },
             '˄': function (go) {
-                var arg1 = stack.pop();
-                if (truthy(arg1))
+                var arg = stack.pop();
+                if (truthy(arg))
                     go();
                 else
-                    stack.push(arg1);
+                    stack.push(arg);
             },
             '˅': function (go) {
-                var arg1 = stack.pop();
-                if (!truthy(arg1))
+                var arg = stack.pop();
+                if (!truthy(arg))
                     go();
                 else
-                    stack.push(arg1);
+                    stack.push(arg);
             }, '∫': function (go) {
-                var arg1 = stack.pop();
-                var arr = [...iterate(arg1)];
+                var arg = stack.pop();
+                var arr = [...iterate(arg)];
                 if (arr.length !== 0) {
                     stack.push(arr[0]);
                     for (var item of iterate(arr.slice(1))) {
@@ -734,8 +756,10 @@ const arities = {
     '?': 3,
     '@': 201,
     'L': 1,
+    'S': 1,
     'T': 1,
     'U': 1,
+    '\\': 201,
     ']': 1,
     '^': 2,
     'g': 2,
