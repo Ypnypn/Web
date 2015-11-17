@@ -56,7 +56,7 @@
     },
     'S': {
         's': 'Sorted characters of `a`',
-        'a': 'Sotered elements of `a`'
+        'a': 'Sorted elements of `a`'
     },
     'T': {
         's': 'Each word of `a` capitalized'
@@ -108,6 +108,15 @@
     'l': {
         '': 'Read one line from input'
     },
+    'o': {
+        'n': 'Character with Unicode value `a`',
+        's': 'Unicode value of `a`'
+    },
+    'p': {
+        'n': 'Prime factors of `a`',
+        's': 'All combinations of characters of `a`',
+        'a': 'All combinations of elements of `a`'
+    },
     'r': {
         '': 'Read entire input'
     },
@@ -153,6 +162,9 @@
         'n': 'Bitwise-not of `a`',
         's': 'Length of `a`',
         'a': 'Length of `a`'
+    },
+    '§': {
+        '?': 'Sort `a`'
     },
     '«': {
         'nn': '`a` shifted left by `b`',
