@@ -1,5 +1,6 @@
 "use strict";
-window.interpretLangName = (function () {
+
+window.interpretBrevity = (function () {
 
     function interpret(code, input, options) {
 
@@ -9,7 +10,7 @@ window.interpretLangName = (function () {
 
         var error = '';
         for (var c of code)
-            if (allLangNameChars.indexOf(c) === -1)
+            if (allBrevityChars.indexOf(c) === -1)
             error += `Contains illegal character: '${c}'\n`;
         if (error.length !== 0)
             throw new Error(error);
@@ -22,8 +23,8 @@ window.interpretLangName = (function () {
             return first;
         }
 
-        const setOutput = options.output || function (a) { output += a; };
         var output = '';
+        const setOutput = options.output || function (a) { output += a; };
 
         const stack = options.stack || [];
 
@@ -39,7 +40,19 @@ window.interpretLangName = (function () {
 
         function parseForwards(start) {
             for (var i = start; i < code.length; i++) {
-                if (code[i] in forwardChars) {
+                if (code[i] === '`') {
+                    for (i++; code[i]; i++) {
+                        if (code[i] === '`')
+                            break;
+                        if (code[i] === '\\') {
+                            var next = code[i + 1];
+                            if (next === '\\' || next === '`' || next === 'n' || next === 'r' || next === 't')
+                                i++;
+                        }
+                    }
+                } else if (code[i] === "'") {
+                    i++;
+                } else if (code[i] in forwardChars) {
                     var forward = parseForwards(i + 1);
                     forwards[i] = forward;
                     i = forward;
@@ -82,12 +95,21 @@ window.interpretLangName = (function () {
                         }
                     }
                     stack.push(str);
+                } else if (ch === '-' && (i === 0 || sub[i - 1] === ' ') && (sub[i + 1] >= '1' && sub[i + 1] <= '9')) {
+                    var j = i;
+                    do j++; while (sub[j] >= '0' && sub[j] <= '9');
+                    if (sub[j] === '.')
+                        do j++; while (sub[j] >= '0' && sub[j] <= '9');
+                    stack.push(+sub.substring(i, j));
+                    i = j - 1;
                 } else if (ch === '0') {
                     stack.push(0);
                 } else if (ch === '₁') {
                     if (i > 0 && sub[i - 1] >= '0' && sub[i - 1] <= '9') {
                         var j = i;
-                        do j++; while ((sub[j] >= '0' && sub[j] <= '9') || sub[j] === '.');
+                        do j++; while (sub[j] >= '0' && sub[j] <= '9');
+                        if (sub[j] === '.')
+                            do j++; while (sub[j] >= '0' && sub[j] <= '9');
                         stack.push(+('1' + sub.substring(i + 1, j)));
                         i = j - 1;
                     } else {
@@ -96,8 +118,10 @@ window.interpretLangName = (function () {
                 } else if (ch === '₂') {
                     if (i > 0 && sub[i - 1] >= '0' && sub[i - 1] <= '9') {
                         var j = i;
-                        do j++; while ((sub[j] >= '0' && sub[j] <= '9') || sub[j] === '.');
-                        stack.push(+('2' + sub.substring(i + 1, j)));
+                        do j++; while (sub[j] >= '0' && sub[j] <= '9');
+                        if (sub[j] === '.')
+                            do j++; while (sub[j] >= '0' && sub[j] <= '9');
+                        stack.push(+(`2${sub.substring(i + 1, j)}`));
                         i = j - 1;
                     } else {
                         var top = stack.pop();
@@ -105,7 +129,9 @@ window.interpretLangName = (function () {
                     }
                 } else if ((ch >= '1' && ch <= '9') || ch === '.') {
                     var j = i;
-                    do j++; while ((sub[j] >= '0' && sub[j] <= '9') || sub[j] === '.');
+                    do j++; while (sub[j] >= '0' && sub[j] <= '9');
+                    if (sub[j] === '.')
+                        do j++; while (sub[j] >= '0' && sub[j] <= '9');
                     stack.push(+sub.substring(i, j));
                     i = j - 1;
                 } else if (ch >= 'V' && ch <= 'Z') {
@@ -169,7 +195,7 @@ window.interpretLangName = (function () {
                         return [str];
                     if (str.length === 0)
                         return [];
-                    return [].concat(...[...str].map((c, i) => strPermute(str.substring(0, i) +str.substring(i +1)).map(s=>c +s)));
+                    return [].concat(...[...str].map((c, i) => strPermute(str.substring(0, i) +str.substring(i +1)).map(s => c +s)));
                 }
 
                 if (typeof (a) === 'string') {
@@ -181,11 +207,27 @@ window.interpretLangName = (function () {
                         return [arr];
                     if (arr.length === 0)
                         return [];
-                    return [].concat(...arr.map((e, i) => arrPermute(arr.slice(0, i).concat(arr.slice(i+1))).map(s=>[e].concat(s))));
+                    return [].concat(...arr.map((e, i) => arrPermute(arr.slice(0, i).concat(arr.slice(i +1))).map(s =>[e].concat(s))));
                 }
 
                 if (Array.isArray(a)) {
                     return arrPermute(a);
+                }
+            },
+            '%': function (a, b) {
+                if (typeof (a) === 'number' && typeof (b) === 'number')
+                    return a % b;
+                if (typeof (a) === 'string' && typeof (b) === 'number') {
+                    var arr = Array(Math.ceil(a.length / b));
+                    for (var ind = 0; ind < arr.length; ind++)
+                        arr[ind] = a.substring(ind * b, (ind + 1) * b);
+                    return arr;
+                }
+                if (Array.isArray(a) && typeof (b) === 'number') {
+                    var arr = Array(Math.ceil(a.length / b));
+                    for (var ind = 0; ind < arr.length; ind++)
+                        arr[ind] = a.slice(ind * b, (ind + 1) * b);
+                    return arr;
                 }
             },
             '&': function (a, b) {
@@ -226,6 +268,22 @@ window.interpretLangName = (function () {
                     }
                     return a.repeat(b) + a.substring(0, (b - (b | 0)) * a.length);
                 }
+                if (typeof (a) === 'string' && typeof (b) === 'string') {
+                    const res = [];
+                    for (var c1 of a)
+                        for (var c2 of b)
+                            res.push(c1 + c2);
+                    return res;
+                }
+                if ((Array.isArray(a) && (typeof (b) === 'string' || Array.isArray(b))) || (typeof (a) === 'string' && Array.isArray((b)))) {
+                    var arr1 = typeof (a) === 'string' ? [...a] : a;
+                    var arr2 = typeof (b) === 'string' ? [...b] : b;
+                    const res = [];
+                    for (var o1 of arr1)
+                        for (var o2 of arr2)
+                            res.push([o1, o2]);
+                    return res;
+                }
                 if (Array.isArray(a) && typeof (b) === 'number') {
                     if (b < 0) {
                         a = a.reverse();
@@ -245,25 +303,53 @@ window.interpretLangName = (function () {
                 if (Array.isArray(a) && Array.isArray(b))
                     return a.concat(b);
             },
+            ',': function (a, b) {
+                if (typeof (a) === 'number')
+                    return Array(a).fill(b, 0, a);
+                if (typeof (a) === 'string' && typeof (b) === 'string')
+                    return a.split(b).length - 1;
+                if (Array.isArray(a))
+                    return a.filter(function (e) { return typeof (e) === typeof (b) && compare(e, b) === 0; }).length;
+            },
             '-': function (a, b) {
-                return a - b;
+                if (typeof (a) === 'number' && typeof (b) === 'number') {
+                    return a - b;
+                }
+                if (typeof (a) === 'string' && typeof (b) === 'string') {
+                    return a.split(b).join('');
+                }
+                if (Array.isArray(a)) {
+                    var ret = [];
+                    for (var o of a)
+                        if (typeof (o) !== typeof (b) || compare(o, b) !== 0)
+                        ret.push(o);
+                    return ret;
+                }
             },
             '/': function (a, b) {
                 if (typeof (a) === 'number' && typeof (b) === 'number')
                     return (a - a % b) / b;
                 if (typeof (a) === 'string' && typeof (b) === 'number') {
-                    var arr = Array(Math.ceil(a.length / b));
-                    for (var ind = 0; ind < arr.length; ind++)
-                        arr[ind] = a.substring(ind * b, (ind + 1) * b);
-                    return arr;
+                    const ret = Array(b);
+                    const subSize = a.length / b | 0;
+                    var extra = a.length % b;
+                    for (var ind = 0; ind < a.length % b; ind++)
+                        ret[ind] = a.slice(ind * (subSize + 1), (ind + 1) * (subSize + 1));
+                    for (var ind = a.length % b; ind < b; ind++)
+                        ret[ind] = a.slice(ind * subSize + extra, (ind + 1) * subSize + extra);
+                    return ret;
                 }
                 if (typeof (a) === 'string' && typeof (b) === 'string')
                     return a.split(b);
                 if (Array.isArray(a) && typeof (b) === 'number') {
-                    var arr = Array(Math.ceil(a.length / b));
-                    for (var ind = 0; ind < arr.length; ind++)
-                        arr[ind] = a.slice(ind * b, (ind + 1) * b);
-                    return arr;
+                    const ret = Array(b);
+                    const subSize = a.length / b | 0;
+                    var extra = a.length % b;
+                    for (var ind = 0; ind < a.length % b; ind++)
+                        ret[ind] = a.slice(ind * (subSize + 1), (ind + 1) * (subSize + 1));
+                    for (var ind = a.length % b; ind < b; ind++)
+                        ret[ind] = a.slice(ind * subSize + extra, (ind + 1) * subSize + extra);
+                    return ret;
                 }
             },
             '<': function (a, b) {
@@ -299,6 +385,32 @@ window.interpretLangName = (function () {
             'T': function (a) {
                 if (typeof (a) === 'string')
                     return a.split(' ').map(w => w[0].toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+                if (Array.isArray(a)) {
+                    if (a.length === 0)
+                        return a;
+                    if (typeof (a[0]) === 'string') {
+                        const maxSize = Math.max(...a.map(b => b.length));
+                        var ret = [];
+                        for (var i = 0; i < maxSize; i++) {
+                            var str = '';
+                            for (var b of a)
+                                if (i < b.length)
+                                str += b[i];
+                            ret.push(str);
+                        }
+                        return ret;
+                    }
+                    if (Array.isArray(a[0])) {
+                        const maxSize = Math.max(...a.map(b => b.length));
+                        if (maxSize === 0)
+                            return [];
+                        var ret = [];
+                        for (var i = 0; i < maxSize; i++) {
+                            ret.push(a.filter(b => i in b).map(b => b[i]));
+                        }
+                        return ret;
+                    }
+                }
             },
             'U': function (a) {
                 if (typeof (a) === 'number') {
@@ -316,6 +428,9 @@ window.interpretLangName = (function () {
                 }
                 if (typeof (a) === 'string')
                     return a.toUpperCase();
+            },
+            '\\': function (a, b) {
+                return [a, b];
             },
             ']': function (a) {
                 return [a];
@@ -348,10 +463,27 @@ window.interpretLangName = (function () {
                     return c.concat(d.reverse());
                 }
             },
-            'i': function () {
-                return getInput();
+            '_': function (a) {
+                function flatten(arr) {
+                    var res = [];
+                    for (var e of arr)
+                        if (Array.isArray(e))
+                        res.push(...flatten(e));
+                    else
+                        res.push(e);
+                    return res;
+                }
+
+                return flatten(a);
             },
             'g': function (a, b) {
+                function gcd(u, v) {
+                    return v ? gcd(v, u % v) : u;
+                }
+
+                if (typeof (a) === 'number' && typeof (b) === 'number') {
+                    return Math.abs(gcd(a, b));
+                }
                 if (typeof (a) === 'string' && typeof (b) === 'number') {
                     const size = a.length;
                     return a[(b % size + size) % size];
@@ -367,6 +499,12 @@ window.interpretLangName = (function () {
                 if (typeof (a) === 'string')
                     return parseInt(a, 16);
             },
+            'i': function () {
+                return getInput();
+            },
+            'j': function (a, b) {
+                return a.map(e => stringify(e)).join(b);
+            },
             'l': function () {
                 var ret = '';
                 var first;
@@ -374,7 +512,7 @@ window.interpretLangName = (function () {
                     ret += first;
                 return ret;
             },
-            'o': function(a) {
+            'o': function (a) {
                 if (typeof (a) === 'number')
                     return String.fromCharCode(a);
                 if (typeof (a) === 'string')
@@ -421,6 +559,36 @@ window.interpretLangName = (function () {
                         result[i] = a.filter((e, j) => (1 << j) & i);
                     }
                     return result;
+                }
+            },
+            'q': function (a) {
+                if (typeof (a) === 'number') {
+                    return 1 / a;
+                }
+                if (typeof (a) === 'string') {
+                    const map = {};
+                    for (var c of a)
+                        if (c in map)
+                        map[c]++;
+                    else
+                        map[c] = 1;
+                    const ret = [];
+                    for (var key in map)
+                        ret.push([key, map[key]]);
+                    ret.sort((x, y) => y[1] - x[1] || compare(x[0], y[0]));
+                    return ret;
+                }
+                if (Array.isArray(a)) {
+                    const ret = [];
+                    for (var e of a) {
+                        var index = ret.findIndex(p => typeof (p[0]) === typeof (e) && compare(p[0], e) === 0);
+                        if (index !== -1)
+                            ret[index][1]++;
+                        else
+                            ret.push([e, 1]);
+                    }
+                    ret.sort((x, y) => y[1] - x[1] || compare(x[0], y[0]));
+                    return ret;
                 }
             },
             'r': function () {
@@ -486,7 +654,7 @@ window.interpretLangName = (function () {
                     if (a.length === 0)
                         return a;
                     if (typeof (a[0]) === 'string') {
-                        var minSize = Math.min(...a.map(b => b.length));
+                        const minSize = Math.min(...a.map(b => b.length));
                         if (minSize === 0)
                             return [];
                         var ret = [];
@@ -499,16 +667,12 @@ window.interpretLangName = (function () {
                         return ret;
                     }
                     if (Array.isArray(a[0])) {
-                        var minSize = Math.min(...a.map(b => b.length));
+                        const minSize = Math.min(...a.map(b => b.length));
                         if (minSize === 0)
                             return [];
                         var ret = [];
-                        for (var i = 0; i < minSize; i++) {
-                            var sub = [];
-                            for (var b of a)
-                                sub.push(b[i]);
-                            ret.push(sub);
-                        }
+                        for (var i = 0; i < minSize; i++)
+                            ret.push(a.map(b => b[i]));
                         return ret;
                     }
                 }
@@ -578,6 +742,9 @@ window.interpretLangName = (function () {
                 if (Array.isArray(a))
                     return a.length;
             },
+            '¦': function (a) {
+                return stringify(a);
+            },
             '«': function (a, b) {
                 if (typeof (a) === 'number' && typeof (b) === 'number')
                     return a << b;
@@ -588,6 +755,9 @@ window.interpretLangName = (function () {
             },
             '¬': function (a) {
                 return +!truthy(a);
+            },
+            '²': function (a) {
+                return chars['*'](a, a);
             },
             '»': function (a, b) {
                 if (typeof (a) === 'number' && typeof (b) === 'number')
@@ -644,6 +814,19 @@ window.interpretLangName = (function () {
                             arr[ind] = a - ind;
                     return arr;
                 }
+                if (typeof (a) === 'string' && typeof (b) === 'string') {
+                    const oA = a.charCodeAt(0);
+                    const oB = b.charCodeAt(0);
+                    const size = Math.abs(oB - oA) + 1;
+                    var str = '';
+                    if (oB >= oA)
+                        for (var ind = 0; ind < size; ind++)
+                            str += String.fromCharCode(oA + ind);
+                    else
+                        for (var ind = 0; ind < size; ind++)
+                            str += String.fromCharCode(oA - ind);
+                    return str;
+                }
             },
             '↨': function (a, b) {
                 if (typeof (a) === 'number' && typeof (b) === 'number') {
@@ -657,6 +840,19 @@ window.interpretLangName = (function () {
                             arr[ind] = a - ind;
                     return arr;
                 }
+                if (typeof (a) === 'string' && typeof (b) === 'string') {
+                    const oA = a.charCodeAt(0);
+                    const oB = b.charCodeAt(0);
+                    const size = Math.abs(oB - oA);
+                    var str = '';
+                    if (oB >= oA)
+                        for (var ind = 0; ind < size; ind++)
+                            str += String.fromCharCode(oA + ind);
+                    else
+                        for (var ind = 0; ind < size; ind++)
+                            str += String.fromCharCode(oA - ind);
+                    return str;
+                }
             },
             '≠': function (a, b) {
                 return +(compare(a, b) !== 0);
@@ -667,13 +863,85 @@ window.interpretLangName = (function () {
             '≥': function (a, b) {
                 return +(compare(a, b) >= 0);
             },
-            '⌐': function (a, b) {
+            '⌐': function (a) {
                 if (typeof (a) === 'number')
                     return -a;
                 if (typeof (a) === 'string')
                     return strReverse(a);
                 if (Array.isArray(a))
                     return a.reverse();
+            },
+            '╞': function (a, b) {
+                if (typeof (a) === 'number') {
+                    const size = b.length || Math.abs(b);
+                    const rotate = (a % size + size) % size;
+                    if (typeof (b) === 'number') {
+                        var ret = Array(size);
+                        if (b >= 0)
+                            for (var i = 0; i < size; i++)
+                                ret[i] = i < size - rotate ? i + rotate : i + rotate - size;
+                        else
+                            for (var i = 0; i < size; i++)
+                                ret[i] = i < size - rotate ? -i - rotate : -i - rotate + size;
+                        return ret;
+                    }
+                    if (typeof (b) === 'string') {
+                        return b.slice(a) + b.slice(0, a);
+                    }
+                    if (Array.isArray(b)) {
+                        return b.slice(a).concat(b.slice(0, a));
+                    }
+                }
+                if (typeof (a) === 'string') {
+                    return a + stringify(b);
+                }
+                if (Array.isArray(a)) {
+                    var ret = a.slice();
+                    ret.push(b);
+                    return ret;
+                }
+            },
+            '╡': function (a, b) {
+                if (typeof (a) === 'number') {
+                    const size = b.length || Math.abs(b);
+                    const rotate = (a % size + size) % size;
+                    if (typeof (b) === 'number') {
+                        var ret = Array(size);
+                        if (b >= 0)
+                            for (var i = 0; i < size; i++)
+                                ret[i] = i < rotate ? i + size - rotate : i - rotate;
+                        else
+                            for (var i = 0; i < size; i++)
+                                ret[i] = i < rotate ? -i - size + rotate : -i + rotate;
+                        return ret;
+                    }
+                    if (typeof (b) === 'string') {
+                        return b.slice(0, a) + b.slice(a);
+                    }
+                    if (Array.isArray(b)) {
+                        return b.slice(0, a).concat(b.slice(a));
+                    }
+                }
+                if (typeof (a) === 'string') {
+                    return stringify(b) + a;
+                }
+                if (Array.isArray(a)) {
+                    var ret = a.slice();
+                    ret.unshift(b);
+                    return ret;
+                }
+            },
+            '☺': function (a) {
+                var str = a % 2 ? 'Hello, world' : 'Hello world';
+                if (a % 6 === 2 || a % 6 === 3)
+                    return str + '.';
+                if (a % 6 === 4 || a % 6 === 5)
+                    return str + '!';
+                return str;
+            },
+            '✶': function (a) {
+                interpret(stringify(a), input, { getInput: getInput, setOutput: setOutput, stack: stack });
+                return [];
             }
         };
 
@@ -702,7 +970,7 @@ window.interpretLangName = (function () {
                 var result = stack.splice(stack.length - size, size);
                 stack.push(result);
             },
-            '\\': function (go) {
+            '[': function (go) {
                 var arg = [...stack.pop()];
                 var size = arg.length;
                 for (var i = 0; i < size; i++) {
@@ -739,16 +1007,58 @@ window.interpretLangName = (function () {
                 else
                     stack.push(arg);
             },
+            '•': function (go) {
+                var arg = stack.pop();
+                var i = 0;
+                var found = false;
+                for (var item of iterate(arg)) {
+                    stack.push(item);
+                    go();
+                    if (truthy(stack.pop())) {
+                        stack.push(i);
+                        found = true;
+                        break;
+                    }
+                    i++;
+                }
+                if (!found)
+                    stack.push(-1);
+            },
             '∫': function (go) {
                 var arg = stack.pop();
                 var arr = [...iterate(arg)];
                 if (arr.length !== 0) {
                     stack.push(arr[0]);
-                    for (var item of iterate(arr.slice(1))) {
+                    for (var item of arr.slice(1)) {
                         stack.push(item);
                         go();
                     }
                 }
+            },
+            '▼': function (go) {
+                var arg = stack.pop();
+                if (typeof (arg) === 'string') {
+                    var res = '';
+                    for (var c of iterate(arg)) {
+                        stack.push(c);
+                        go();
+                        if (truthy(stack.pop()))
+                            res += c;
+                    }
+                    stack.push(res);
+                } else {
+                    var res = [];
+                    for (var item of iterate(arg)) {
+                        go();
+                        if (truthy(stack.pop()))
+                            res.push(item);
+                    }
+                    stack.push(res);
+                }
+            },
+            '◊': function (go) {
+                while (stack.pop())
+                    go();
             }
         };
 
@@ -800,16 +1110,18 @@ window.interpretLangName = (function () {
     return interpret;
 })();
 
-const allLangNameChars =
+const allBrevityChars =
     '\n !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~' +
-    '§«¬»÷Σπ˄˅″‴₁₂↑↓↔↕↨∫≠≤≥⌐';
+    '¦§«¬²»÷Σπ˄˅•″‴₁₂↑↓↔↕↨∫≠≤≥⌐╞╡▼◊☺✶';
 
 const arities = {
     '!': 1,
+    '%': 2,
     '&': 2,
     '(': 200,
     '*': 2,
     '+': 2,
+    ',': 2,
     '-': 2,
     '/': 2,
     ':': 202,
@@ -822,30 +1134,37 @@ const arities = {
     'S': 1,
     'T': 1,
     'U': 1,
-    '\\': 201,
+    '[': 201,
+    '\\': 2,
     ']': 1,
     '^': 2,
+    '_': 1,
     'g': 2,
     'h': 1,
     'i': 0,
+    'j': 2,
     'l': 0,
     'o': 1,
     'p': 1,
+    'q': 1,
     'r': 0,
     's': 3,
     't': 1,
     'u': 1,
     '|': 2,
     '~': 1,
+    '¦': 1,
     '§': 201,
     '«': 2,
     '¬': 1,
+    '²': 1,
     '»': 2,
     '÷': 2,
     'Σ': 1,
     'π': 0,
     '˄': 201,
     '˅': 201,
+    '•': 201,
     '″': 101,
     '‴': 101,
     '↑': 1,
@@ -857,7 +1176,13 @@ const arities = {
     '≠': 2,
     '≤': 2,
     '≥': 2,
-    '⌐': 1
+    '⌐': 1,
+    '╞': 2,
+    '╡': 2,
+    '▼': 201,
+    '◊': 200,
+    '☺': 1,
+    '✶': 101
 };
 
 function stringify(val) {
