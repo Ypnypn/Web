@@ -4,6 +4,11 @@
         's': 'Permutations of `a`',
         'a': 'Permutations of `a`'
     },
+    '%': {
+        'nn': '`a` modulo `b`',
+        'sn': '`a` split into substrings of length `b`',
+        'an': '`a` split into sub-arrays of length `b`'
+    },
     '&': {
         'nn': 'Bitwise-and of `a` and `b`',
         'ss': 'Intersection of `a` and `b`, in order of appearance in `a`',
@@ -18,19 +23,32 @@
     '*': {
         'nn': '`a` times `b`',
         'sn': '`a` repeated `b` times',
-        'an': '`a` repeated `b` times'
+        'ss': 'Cartesian product of `a` and `b`',
+        'sa': 'Cartesian product of `a` and `b`',
+        'an': '`a` repeated `b` times',
+        'as': 'Cartesian product of `a` and `b`',
+        'aa': 'Cartesian product of `a` and `b`'
     },
     '+': {
         'nn': '`a` plus `b`',
         'ss': 'Concatenation of `a` and `b`',
         'aa': 'Concatenation of `a` and `b`'
     },
+    ',': {
+        'n?': 'Array with `a` instances of `b`',
+        'ss': 'Number of occurances of `b` within `a`',
+        'a?': 'Number of occurances of `b` in `a`'
+    },
     '-': {
-        'nn': '`a` minus `b`'
+        'nn': '`a` minus `b`',
+        'ss': '`a`, with each `b` removed',
+        'a?': '`a`, with each `b` removed'
     },
     '/': {
         'nn': '`a` divided by `b`, truncated to integer',
-        'ss': '`a` split by `b`'
+        'sn': '`a` split into `b` substrings',
+        'ss': '`a` split by `b`',
+        'an': '`a` split into `b` sub-arrays'
     },
     ':': {
         '??': 'Execute for each of `a` and `b`, and wrap in array'
@@ -59,7 +77,8 @@
         'a': 'Sorted elements of `a`'
     },
     'T': {
-        's': 'Each word of `a` capitalized'
+        's': 'Each word of `a` capitalized',
+        'a': '`a` transposed'
     },
     'U': {
         'n': 'Integers from 1 (inclusive) to `a` (inclusive)',
@@ -80,8 +99,11 @@
     'Z': {
         '': 'Set to `z`'
     },
-    '\\': {
+    '[': {
         '?': 'Map `a`'
+    },
+    '\\': {
+        '??': 'Array containing `a` and `b`'
     },
     ']': {
         '?': 'Array containing just `a`'
@@ -91,10 +113,14 @@
         'ss': 'Characters of `a` not in `b`, then characters of `b` not in `a`',
         'aa': 'Elements of `a` not in `b`, then elements of `b` not in `a`'
     },
+    '_': {
+        'a': '`a` flattened'
+    },
     '`': {
         '': 'String literal, with `\\` used to escape'
     },
     'g': {
+        'nn': 'Greatest common denominator of `a` and `b`',
         'sn': 'The `b`\'th character of `a`',
         'an': 'The `b`\'th element of `a`'
     },
@@ -102,11 +128,14 @@
         'n': '`a` in hexadecimal',
         's': '`a`, treated as hexacidemal'
     },
+    'j': {
+        'as': 'Elements of `a` joined with `b`'
+    },
     'i': {
-        '': 'Read one character from input'
+        '': 'One character from input'
     },
     'l': {
-        '': 'Read one line from input'
+        '': 'One line from input'
     },
     'o': {
         'n': 'Character with Unicode value `a`',
@@ -117,8 +146,13 @@
         's': 'All combinations of characters of `a`',
         'a': 'All combinations of elements of `a`'
     },
+    'q': {
+        'n': 'Reciprocal of `a`',
+        's': 'All distinct characters of `a` with frequencies',
+        'a': 'All distinct elements of `a` with frequencies'
+    },
     'r': {
-        '': 'Read entire input'
+        '': 'Entire input'
     },
     's': {
         'nnn': 'Numbers from `a` (inclusive) to `b` (inclusive), with a step of `c`',
@@ -131,7 +165,7 @@
     },
     't': {
         's': '`a` with leading and trailing whitespace removed',
-        'a': '`a` transposed'
+        'a': '`a` transposed, truncated'
     },
     'u': {
         'n': 'Integers from 0 (inclusive) until `a` (exclusive)',
@@ -163,6 +197,9 @@
         's': 'Length of `a`',
         'a': 'Length of `a`'
     },
+    '¦': {
+        '?': '`a` as string'
+    },
     '§': {
         '?': 'Sort `a`'
     },
@@ -173,6 +210,11 @@
     },
     '¬': {
         '?': 'Logical not of `a`'
+    },
+    '²': {
+        'n': 'Square of `a`',
+        's': 'Cartesian product of `a` and itself',
+        'a': 'Cartesian product of `a` and itself'
     },
     '»': {
         'nn': '`a` shifted right by `b`',
@@ -193,6 +235,9 @@
     },
     '˅': {
         '?': 'If `a` is true, leave on stack; otherwise, execute'
+    },
+    '•': {
+        '?': 'Find first index of `a` where true (equivalent to foreach-if-break)'
     },
     '″': {
         '?': 'Two copies of `a`'
@@ -220,10 +265,12 @@
         '??': '`b`, then `a`'
     },
     '↕': {
-        'nn': 'Integers from `a` (inclusive) to `b` (inclusive)'
+        'nn': 'Integers from `a` (inclusive) to `b` (inclusive)',
+        'ss': 'Characters from `a` (inclusive) to `b` (inclusive)'
     },
     '↨': {
-        'nn': 'Integers from `a` (inclusive) to `b` (exclusive)'
+        'nn': 'Integers from `a` (inclusive) to `b` (exclusive)',
+        'ss': 'Characters from `a` (inclusive) to `b` (exclusive)'
     },
     '∫': {
         '?': 'Reduce `a`'
@@ -241,5 +288,24 @@
         'n': 'Opposite of `a`',
         's': 'Reverse of `a`',
         'a': 'Reverse of `a`'
-    }
+    },
+    '╞': {
+        'n?': '`b` rotated `a` places to the left',
+        's?': '`a` concatenated with `b`',
+        'a?': '`a` with `b` inserted at the end'
+    },
+    '╡': {
+        'n?': '`b` rotated `a` places to the right',
+        's?': '`b` concatenated with `a`',
+        'a?': '`a` with `b` inserted at the beginng'
+    },
+    '▼': {
+        '?': 'Filter `a`'
+    },
+    '◊': {
+        '': 'While'
+    },
+    '✶': {
+        '?': 'Execute Brevity code'
+    },
 };

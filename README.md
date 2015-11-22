@@ -1,14 +1,18 @@
-#LangName - <a href="http://ypnypn.github.io/LangName/index.html">try it now</a>
+#Brevity
 
-LangName is a stack-based language based on CJam and Pyth.    
+Brevity is a stack-based language based on CJam and Pyth. <a href="http://ypnypn.github.io/Brevity/index.html">Try it now</a>.
+
+Brevity is implemented in JavaScript and run entirely client-side. It has been tested well in Firefox and somewhat in Chrome, but does not work at all in Internet Explorer.
+
+You can run the official test suite on your browser by visiting http://ypnypn.github.io/Brevity/tests.html.
 
 ##The encoding
 
-LangName uses less than 256 characters, from across the Unicode range.    
+Brevity uses less than 256 characters, from across the Unicode range.    
 
 On the website, you can simply type these characters from the keyboard, or use the buttons on the right of the page.    
 
-Alternatively, you can use a hex-editor on your computer, and then upload a `.langname` file.    
+Alternatively, you can use a hex-editor on your computer, and then upload a `.brevity` file.    
 
 For example, the following hex file:    
 
@@ -16,17 +20,17 @@ For example, the following hex file:
 
 refers to the twenty-sixth button on the webpage (`9`), followed by the second (`!`). This encodes the program `9!`, which calculates 9 factorial, or 362880.    
 
-Thus, this encoding uses only one byte per character. A consequence of this is that only those characters on the webpage can be used in LangName. For example, the tab character can not be used, even in string literals.    
+Thus, this encoding uses only one byte per character. A consequence of this is that only those characters on the webpage can be used in Brevity. For example, the tab character can not be used, even in string literals.    
 
 ##The language
 
-A LangName program places values on the stack and performs operations on them.    
+A Brevity program places values on the stack and performs operations on them.    
 
 There are three common datatypes - numbers, strings, and arrays.    
 
-Number literals mean what they are. If a literal starts with <code>0</code>, the next character begins a new number. When following a number literal, <code>&#x2081;</code> and <code>&#x2082;</code> also begin new literals.    
+Number literals mean what they are. If a literal starts with <code>0</code>, the next character begins a new number. When following a number literal, `₁` and `₂` also begin new literals.    
 
-    12 034&#x2081;5     -- pushes 12, 0, 34, 15
+    12 034₁5     -- pushes 12, 0, 34, 15
 
 String literals begin and end with `\``, with `\\` used to escape. Single-character literals can be made with `'`.
 
