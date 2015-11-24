@@ -11,6 +11,7 @@
 <body>
     <h1>Brevity Tests</h1>
     <h2 id="summary">Running tests...</h2>
+    <p id="timer" hidden>Tests took <span id="time"></span> to run.</p>
     <div id="failed" hidden>
         <h3>Failed tests</h3>
         <table>
@@ -72,7 +73,10 @@
     <script>
         $(document).ready(function () {
             setTimeout(function () {
+                var start = new Date();
                 var testResults = runTests();
+                var end = new Date();
+
                 var passed = testResults.passed;
                 var failed = testResults.failed;
                 if (failed.length === 0) {
@@ -97,6 +101,8 @@
                         $tr.appendTo($("#passed tbody"));
                     });
                 }
+
+                $("#time").text((end - start) / 1000 + ' seconds').parent().show();
 
                 function test_s(arr) {
                     return arr.length + (arr.length === 1 ? ' test' : ' tests');

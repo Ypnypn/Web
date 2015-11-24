@@ -1,4 +1,8 @@
 ﻿const documentation = {
+
+    '\n': {
+        '?': 'Print and keep `a`'
+    },
     '!': {
         'n': 'Factorial of `a`',
         's': 'Permutations of `a`',
@@ -7,7 +11,9 @@
     '%': {
         'nn': '`a` modulo `b`',
         'sn': '`a` split into substrings of length `b`',
-        'an': '`a` split into sub-arrays of length `b`'
+        'an': '`a` split into sub-arrays of length `b`',
+        'as': 'Time represented by `a`, formatted with `b`',
+        'aa': 'Matrix `a` completed with `b`'
     },
     '&': {
         'nn': 'Bitwise-and of `a` and `b`',
@@ -44,6 +50,9 @@
         'ss': '`a`, with each `b` removed',
         'a?': '`a`, with each `b` removed'
     },
+    '.': {
+        '': 'Numeric literal, or map'
+    },
     '/': {
         'nn': '`a` divided by `b`, truncated to integer',
         'sn': '`a` split into `b` substrings',
@@ -68,15 +77,33 @@
     '@': {
         '?': 'Execute for each of `a`'
     },
+    'K': {
+        '': 'Break out of loop (`@`, `◊`, `♦`)'
+    },
     'L': {
         'n': 'Natural logarithm of `a`',
         's': '`a` in lower case'
     },
+    'N': {
+        'n': 'Year, month, day, hour, minute, second, millisecond of time `a` milliseconds past epoch',
+        's': 'Year, month, day, hour, minute, second, millisecond of time represented by `a`',
+        'a': 'Milliseconds since epoch of time represented by `a`'
+    },
+    'P': {
+        'n': '2 to the power of `a`',
+        's': '`a` split by spaces',
+        'a': 'Elements of `a` joined with spaces'
+    },
+    'Q': {
+        '': 'End the program'
+    },
     'S': {
+        'n': 'Base-2 logarithm of `a`',
         's': 'Sorted characters of `a`',
         'a': 'Sorted elements of `a`'
     },
     'T': {
+        'n': 'Ten to the power of `a`',
         's': 'Each word of `a` capitalized',
         'a': '`a` transposed'
     },
@@ -134,8 +161,17 @@
     'i': {
         '': 'One character from input'
     },
+    'k': {
+        '': 'Entire stack'
+    },
     'l': {
         '': 'One line from input'
+    },
+    'm': {
+        'a': 'Arithmetic mean of `a`'
+    },
+    'n': {
+        '': 'Current year, month, day, hour, minute, second, millisecond'
     },
     'o': {
         'n': 'Character with Unicode value `a`',
@@ -164,6 +200,7 @@
         '?a?': '`b`, with each `a` replaced with `c`'
     },
     't': {
+        'n': 'Base-10 logarithm of `a`',
         's': '`a` with leading and trailing whitespace removed',
         'a': '`a` transposed, truncated'
     },
@@ -197,6 +234,9 @@
         's': 'Length of `a`',
         'a': 'Length of `a`'
     },
+    '¡': {
+        'a': 'Elements of `a`, separately'
+    },
     '¦': {
         '?': '`a` as string'
     },
@@ -221,8 +261,26 @@
         'sn': 'Last `b` characters of `b`',
         'an': 'Last `b` elements of `b`'
     },
-    '÷': {
-        'nn': '`a` divided by `b`'
+    '½': {
+        'n': '`a` divided by two',
+        's': 'Medians of `a`',
+        'a': 'Medians of `a`'
+    },
+    '˄': {
+        '?': 'If `a` is false, leave on stack; otherwise, execute'
+    },
+    '˅': {
+        '?': 'If `a` is true, leave on stack; otherwise, execute'
+    },
+    '˦': {
+        'nn': 'Larger of `a` and `b`',
+        's?': 'First index of `b` in `a`',
+        'a?': 'First index of `b` in `a`',
+    },
+    '˨': {
+        'nn': 'Smaller of `a` and `b`',
+        's?': 'Last index of `b` in `a`',
+        'a?': 'Last index of `b` in `a`',
     },
     'Σ': {
         'a': 'Sum of elements of `a`'
@@ -230,11 +288,9 @@
     'π': {
         '': 'Pi'
     },
-    '˄': {
-        '?': 'If `a` is false, leave on stack; otherwise, execute'
-    },
-    '˅': {
-        '?': 'If `a` is true, leave on stack; otherwise, execute'
+    '‖': {
+        'n': 'Absolute value of `a`',
+        'a': 'Square root of sum of squares of numbers in `a`',
     },
     '•': {
         '?': 'Find first index of `a` where true (equivalent to foreach-if-break)'
@@ -244,6 +300,11 @@
     },
     '‴': {
         '?': 'Three copies of `a`'
+    },
+    'ⁿ': {
+        'nn': '`a` to the power of `b`',
+        'sn': '`b`-ary cartesian power of `a`',
+        'an': '`b`-ary cartesian power of `a`'
     },
     '₁': {
         '': 'If preceded by a numeral, begin a new number starting with 1; otherwise, remove top of stack'
@@ -289,6 +350,16 @@
         's': 'Reverse of `a`',
         'a': 'Reverse of `a`'
     },
+    '┐': {
+        'n': 'Smallest integer not greater than `a`',
+        's': '`a` without its first character',
+        'a': '`a` without its first eleemnt'
+    },
+    '┘': {
+        'n': 'Greatest integer not less than `a`',
+        's': '`a` without its last character',
+        'a': '`a` without its last eleemnt'
+    },
     '╞': {
         'n?': '`b` rotated `a` places to the left',
         's?': '`a` concatenated with `b`',
@@ -302,8 +373,14 @@
     '▼': {
         '?': 'Filter `a`'
     },
+    '◄': {
+        '': 'Wrap stack in array'
+    },
     '◊': {
-        '': 'While'
+        '': 'While, and discard condition'
+    },
+    '♦': {
+        '': 'While, and keep condition'
     },
     '✶': {
         '?': 'Execute Brevity code'
