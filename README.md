@@ -18,7 +18,7 @@ For example, the following hex file:
 
     1a 02
 
-refers to the twenty-sixth button on the webpage (`9`), followed by the second (`!`). This encodes the program `9!`, which calculates 9 factorial, or 362880.    
+refers to the twenty-seventh button on the webpage (`9`), followed by the third (`!`). This encodes the program `9!`, which calculates 9 factorial, or 362880.    
 
 Thus, this encoding uses only one byte per character. A consequence of this is that only those characters on the webpage can be used in Brevity. For example, the tab character can not be used, even in string literals.    
 
@@ -30,7 +30,7 @@ There are three common datatypes - numbers, strings, and arrays.
 
 Number literals mean what they are. If a literal starts with <code>0</code>, the next character begins a new number. When following a number literal, `₁` and `₂` also begin new literals.    
 
-    12 034₁5     -- pushes 12, 0, 34, 15
+    12 034₁5            -- pushes 12, 0, 34, 15
 
 String literals begin and end with `\``, with `\\` used to escape. Single-character literals can be made with `'`.
 
@@ -38,4 +38,4 @@ String literals begin and end with `\``, with `\\` used to escape. Single-charac
 	
 Arrays can be created with the `(` operator, Lisp-style.    
 
-    (2 3`abc`()          -- pushes (2 3 abc ())
+    (2 3`abc`()         -- pushes (2 3 abc ())

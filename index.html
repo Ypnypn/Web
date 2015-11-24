@@ -48,6 +48,15 @@
     <script>
         $(document).ready(function () {
 
+            function updateCodeSize() {
+                const codeSize = $("#code").val().length;
+                $("#size").text(codeSize + " bytes");
+            }
+
+            try {
+                updateCodeSize();
+            } catch (e) { }
+
             try {
                 for (var ind = 0; ind < allBrevityChars.length; ind++)
                     (function (ch) {
@@ -95,10 +104,7 @@
             } catch (e) {
             }
 
-            setInterval(function () {
-                const codeSize = $("#code").val().length;
-                $("#size").text(codeSize + " bytes");
-            }, 200);
+            setInterval(updateCodeSize(), 200);
 
             $("#run").prop("disabled", false);
             $("#run").click(function () {
