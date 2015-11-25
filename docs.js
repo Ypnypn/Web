@@ -51,7 +51,7 @@
         'a?': '`a`, with each `b` removed'
     },
     '.': {
-        '': 'Numeric literal, or map'
+        '': 'Numeric literal, or map, or pairwise'
     },
     '/': {
         'nn': '`a` divided by `b`, truncated to integer',
@@ -141,6 +141,8 @@
         'aa': 'Elements of `a` not in `b`, then elements of `b` not in `a`'
     },
     '_': {
+        'n': 'Sign of `a`',
+        's': 'Array of characters of `a`',
         'a': '`a` flattened'
     },
     '`': {
@@ -224,10 +226,16 @@
     'z': {
         '': 'Variable (initialized to space)'
     },
+    '{': {
+        '??': 'Map `a` with left-parameter `b`'
+    },
     '|': {
         'nn': 'Bitwise-or of `a` and `b`',
         'ss': 'Union of `a` and `b`, in the order of `a` followed by remaining characters of `b`',
         'aa': 'Union of `a` and `b`, in the order of `a` followed by remaining elements of `b`'
+    },
+    '}': {
+        '??': 'Map `a` with right-parameter `b`'
     },
     '~': {
         'n': 'Bitwise-not of `a`',
@@ -255,6 +263,9 @@
         'n': 'Square of `a`',
         's': 'Cartesian product of `a` and itself',
         'a': 'Cartesian product of `a` and itself'
+    },
+    '·': {
+        '': 'Immutable, or map with right-parameter'
     },
     '»': {
         'nn': '`a` shifted right by `b`',
@@ -291,9 +302,6 @@
     '‖': {
         'n': 'Absolute value of `a`',
         'a': 'Square root of sum of squares of numbers in `a`',
-    },
-    '•': {
-        '?': 'Find first index of `a` where true (equivalent to foreach-if-break)'
     },
     '″': {
         '?': 'Two copies of `a`'
@@ -379,10 +387,23 @@
     '◊': {
         '': 'While, and discard condition'
     },
+    '●': {
+        '?': 'Find first index of `a` where true (equivalent to foreach-if-break)'
+    },
+    '◘': {
+        'n': 'Random number between zero and `a`',
+        's': 'Random permutation of `a`',
+        'a': 'Random permutation of `a`'
+    },
+    '◙': {
+        'n': 'Random integer between zero and `a`',
+        's': 'Random character of `a`',
+        'a': 'Random element of `a`'
+    },
     '♦': {
         '': 'While, and keep condition'
     },
     '✶': {
-        '?': 'Execute Brevity code'
+        '?': 'Execute Par code'
     },
 };

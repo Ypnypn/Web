@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <script src="jquery-2.1.3.min.js"></script>
-    <script src="langName.js"></script>
+    <script src="par.js"></script>
     <script src="docs.js"></script>
     <script src="test.js"></script>
-    <title>Brevity</title>
+    <title>Par</title>
 </head>
 <body>
     <div style="width: 50%; float: left">
-        <h1>Brevity Interpreter</h1>
+        <h1>Par Interpreter</h1>
         <div style="width: 50%; float: left">
             <h2>Code - <span id="size">0 bytes</span></h2>
         </div>
         <div style="width: 50%; float: right">
-            <label for="fileUpload">Upload .brevity file</label>
+            <label for="fileUpload">Upload .par file</label>
         </div>
-        <input type="file" id="fileUpload" accept=".brevity" />
+        <input type="file" id="fileUpload" accept=".par" />
         <textarea id="code" rows="4" cols="60"></textarea>
         <h2>Input</h2>
         <textarea id="input" rows="4" cols="60"></textarea>
@@ -58,7 +58,7 @@
             } catch (e) { }
 
             try {
-                for (var ind = 0; ind < allBrevityChars.length; ind++)
+                for (var ind = 0; ind < allParChars.length; ind++)
                     (function (ch) {
                         $("<button>").appendTo($("#buttons")).text(ch === '\n' ? '<LF>' : ch === ' ' ? '<SP>' : ch).click(function () {
                             const caretPos = $("#code")[0].selectionStart;
@@ -100,7 +100,7 @@
                             $("#docHeaderRow th").remove();
                             $("#doc tbody td").remove();
                         });
-                    })(allBrevityChars[ind]);
+                    })(allParChars[ind]);
             } catch (e) {
             }
 
@@ -113,7 +113,7 @@
                 if (checkCodeValid(code)) {
                     const input = $("#input").val();
                     try {
-                        const result = interpretBrevity(code, input);
+                        const result = interpretPar(code, input);
                         const stack = result[0];
                         const output = result[1];
                         $("#output").val(output + stack.map(stringify).join(' '));
@@ -127,7 +127,7 @@
             function checkCodeValid(code) {
                 var output = '';
                 for (var i = 0; i < code.length; i++) {
-                    if (allBrevityChars.indexOf(code[i]) === -1) {
+                    if (allParChars.indexOf(code[i]) === -1) {
                         output += "Contains illegal character: '" + c + "'\n";
                     }
                 }
@@ -143,7 +143,7 @@
                 const reader = new FileReader();
                 reader.onloadend = function () {
                     const data = reader.result;
-                    const code = data.split('').map(function (b) { return allBrevityChars[b.charCodeAt(0)]; }).join('');
+                    const code = data.split('').map(function (b) { return allParChars[b.charCodeAt(0)]; }).join('');
                     $("#code").val(code);
                 };
                 reader.readAsBinaryString(file);

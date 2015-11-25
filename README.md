@@ -1,18 +1,18 @@
-#Brevity
+#Par
 
-Brevity is a stack-based language based on CJam and Pyth. <a href="http://ypnypn.github.io/Brevity/index.html">Try it now</a>.
+Par is a stack-based language based on CJam and Pyth. <a href="http://ypnypn.github.io/Par/index.html">Try it now</a>.
 
-Brevity is implemented in JavaScript and run entirely client-side. It has been tested well in Firefox and somewhat in Chrome, but does not work at all in Internet Explorer.
+Par is implemented in JavaScript and run entirely client-side. It has been tested well in Firefox and somewhat in Chrome, but does not work at all in Internet Explorer.
 
-You can run the official test suite on your browser by visiting http://ypnypn.github.io/Brevity/tests.html.
+You can run the official test suite on your browser by visiting http://ypnypn.github.io/Par/tests.html.
 
 ##The encoding
 
-Brevity uses less than 256 characters, from across the Unicode range.    
+Par uses less than 256 characters, from across the Unicode range.    
 
 On the website, you can simply type these characters from the keyboard, or use the buttons on the right of the page.    
 
-Alternatively, you can use a hex-editor on your computer, and then upload a `.brevity` file.    
+Alternatively, you can use a hex-editor on your computer, and then upload a `.par` file.    
 
 For example, the following hex file:    
 
@@ -20,11 +20,11 @@ For example, the following hex file:
 
 refers to the twenty-seventh button on the webpage (`9`), followed by the third (`!`). This encodes the program `9!`, which calculates 9 factorial, or 362880.    
 
-Thus, this encoding uses only one byte per character. A consequence of this is that only those characters on the webpage can be used in Brevity. For example, the tab character can not be used, even in string literals.    
+Thus, this encoding uses only one byte per character. A consequence of this is that only those characters on the webpage can be used in Par. For example, the tab character can not be used, even in string literals.    
 
 ##The language
 
-A Brevity program places values on the stack and performs operations on them.    
+A Par program places values on the stack and performs operations on them.    
 
 There are three common datatypes - numbers, strings, and arrays.    
 

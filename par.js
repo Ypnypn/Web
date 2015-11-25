@@ -1,6 +1,6 @@
 "use strict";
 
-window.interpretBrevity = (function () {
+window.interpretPar = (function () {
 
     function interpret(code, input, options) {
 
@@ -12,7 +12,7 @@ window.interpretBrevity = (function () {
         // Check code for illegal characters
         var error = '';
         for (var c of code)
-            if (allBrevityChars.indexOf(c) === -1)
+            if (allParChars.indexOf(c) === -1)
             error += `Contains illegal character: '${c}'\n`;
         if (error.length !== 0)
             throw new Error(error);
@@ -102,6 +102,18 @@ window.interpretBrevity = (function () {
                         }
                     }
                     stack.push(str);
+                } else if (ch === '·') {
+                    i++;
+                    var next = sub[i];
+                    const arity = arities[next];
+                    if (arity === 1) {
+                        const arg = stack.length !== 0 ? stack.pop() : chars['l']();
+                        stack.push(+(compare(arg, chars[next](arg)) === 0));
+                    } else if (arity === 2) {
+                        const arg2 = stack.pop();
+                        const arg1 = stack.pop();
+                        stack.push([...iterate(arg1)].map(e => chars[next](e, arg2)));
+                    }
                 } else if (ch === '-' && (i === 0 || sub[i - 1] === ' ') && (sub[i + 1] >= '1' && sub[i + 1] <= '9')) {
                     var j = i;
                     do j++;
@@ -116,7 +128,8 @@ window.interpretBrevity = (function () {
                     var next = sub[j];
                     if (next >= '0' && next <= '9') {
                         var j = i;
-                        do j++; while (sub[j] >= '0' && sub[j] <= '9');
+                        do j++;
+                        while (sub[j] >= '0' && sub[j] <= '9');
                         stack.push(+sub.substring(i, j));
                         i = j - 1;
                     } else {
@@ -128,11 +141,7 @@ window.interpretBrevity = (function () {
                         } else if (arity === 2) {
                             const arg2 = [...iterate(stack.pop())];
                             const arg1 = [...iterate(stack.pop())];
-                            const res = Array(arg1.length);
-                            for (var k = 0; k < arg1.length; k++) {
-                                res[k] = chars[next](arg1[k], arg2[k % arg2.length]);
-                            }
-                            stack.push(res);
+                            stack.push(arg1.map((e,k) => chars[next](e, arg2[k % arg2.length])));
                         }
                     }
                 } else if (ch === '0') {
@@ -140,9 +149,11 @@ window.interpretBrevity = (function () {
                 } else if (ch === '₁') {
                     if (i > 0 && sub[i - 1] >= '0' && sub[i - 1] <= '9') {
                         var j = i;
-                        do j++; while (sub[j] >= '0' && sub[j] <= '9');
+                        do j++;
+                        while (sub[j] >= '0' && sub[j] <= '9');
                         if (sub[j] === '.' && (sub[j + 1] >= '0' && sub[j + 1] <= '9'))
-                            do j++; while (sub[j] >= '0' && sub[j] <= '9');
+                            do j++;
+                            while (sub[j] >= '0' && sub[j] <= '9');
                         stack.push(+('1' + sub.substring(i + 1, j)));
                         i = j - 1;
                     } else {
@@ -151,9 +162,11 @@ window.interpretBrevity = (function () {
                 } else if (ch === '₂') {
                     if (i > 0 && sub[i - 1] >= '0' && sub[i - 1] <= '9') {
                         var j = i;
-                        do j++; while (sub[j] >= '0' && sub[j] <= '9');
+                        do j++;
+                        while (sub[j] >= '0' && sub[j] <= '9');
                         if (sub[j] === '.' && (sub[j + 1] >= '0' && sub[j + 1] <= '9'))
-                            do j++; while (sub[j] >= '0' && sub[j] <= '9');
+                            do j++;
+                            while (sub[j] >= '0' && sub[j] <= '9');
                         stack.push(+(`2${sub.substring(i + 1, j)}`));
                         i = j - 1;
                     } else {
@@ -162,9 +175,11 @@ window.interpretBrevity = (function () {
                     }
                 } else if (ch >= '1' && ch <= '9') {
                     var j = i;
-                    do j++; while (sub[j] >= '0' && sub[j] <= '9');
+                    do j++;
+                    while (sub[j] >= '0' && sub[j] <= '9');
                     if (sub[j] === '.' && (sub[j + 1] >= '0' && sub[j + 1] <= '9'))
-                        do j++; while (sub[j] >= '0' && sub[j] <= '9');
+                        do j++;
+                        while (sub[j] >= '0' && sub[j] <= '9');
                     stack.push(+sub.substring(i, j));
                     i = j - 1;
                 } else if (ch >= 'V' && ch <= 'Z') {
@@ -564,8 +579,14 @@ window.interpretBrevity = (function () {
                 }
             },
             '_': function (a) {
+                if (typeof a === 'number')
+                    return Math.sign(a);
+
+                if (typeof a === 'string')
+                    return [...a];
+
                 function flatten(arr) {
-                    var res = [];
+                    const res = [];
                     for (var e of arr)
                         if (Array.isArray(e))
                         res.push(...flatten(e));
@@ -573,8 +594,8 @@ window.interpretBrevity = (function () {
                         res.push(e);
                     return res;
                 }
-
-                return flatten(a);
+                if (Array.isArray(a))
+                    return flatten(a);
             },
             'g': function (a, b) {
                 function gcd(u, v) {
@@ -1134,6 +1155,40 @@ window.interpretBrevity = (function () {
                 stack.splice(0, stack.length);
                 return copy;
             },
+            '◘': function (a) {
+                if (typeof a === 'number')
+                    return Math.random() * a;
+
+                // adapted from http://stackoverflow.com/a/2450976/3148067 
+                // cc by-sa 3.0
+                function shuffle(array) {
+                    for (var currentIndex = array.length; currentIndex !== 0;) {
+                        const randomIndex = Math.random() * currentIndex | 0;
+                        currentIndex--;
+                        const temporaryValue = array[currentIndex];
+                        array[currentIndex] = array[randomIndex];
+                        array[randomIndex] = temporaryValue;
+                    }
+                    return array;
+                }
+
+                if (typeof a === 'string')
+                    return shuffle([...a]).join('');
+                if (Array.isArray(a))
+                    return shuffle(a);
+            },
+            '◙': function (a) {
+                function rand(num) {
+                    return Math.random() * num | 0;
+                }
+
+                if (typeof a === 'number')
+                    return rand(a);
+                if (typeof a === 'string')
+                    return a[rand(a.length)];
+                if (Array.isArray(a))
+                    return a[rand(a.length)];
+            },
             '☺': function (a) {
                 var str = a % 2 ? 'Hello, world' : 'Hello world';
                 if (a % 6 === 2 || a % 6 === 3)
@@ -1184,13 +1239,49 @@ window.interpretBrevity = (function () {
                 stack.push(result);
             },
             '[': function (go) {
-                var arg = [...iterate(stack.pop())];
-                var size = arg.length;
+                var arg = iterate(stack.pop());
                 var i = 0;
                 try {
-                    for (; i < size; i++) {
-                        stack.push(arg[i]);
+                    for (var e of arg) {
+                        stack.push(e);
                         go();
+                        i++;
+                    }
+                } catch (e) {
+                    if (!(e instanceof BreakLoop))
+                        throw e;
+                }
+                var result = stack.splice(stack.length - i, i);
+                stack.push(result);
+            },
+            '{': function (go) {
+                const leftParam = stack.pop();
+                const arg = iterate(stack.pop());
+                var i = 0;
+                try {
+                    for (var e of arg) {
+                        stack.push(leftParam);
+                        stack.push(e);
+                        go();
+                        i++;
+                    }
+                } catch (e) {
+                    if (!(e instanceof BreakLoop))
+                        throw e;
+                }
+                var result = stack.splice(stack.length - i, i);
+                stack.push(result);
+            },
+            '}': function (go) {
+                const rightParam = stack.pop();
+                const arg = iterate(stack.pop());
+                var i = 0;
+                try {
+                    for (var e of arg) {
+                        stack.push(e);
+                        stack.push(rightParam);
+                        go();
+                        i++;
                     }
                 } catch (e) {
                     if (!(e instanceof BreakLoop))
@@ -1226,7 +1317,7 @@ window.interpretBrevity = (function () {
                 else
                     stack.push(arg);
             },
-            '•': function (go) {
+            '●': function (go) {
                 var arg = stack.pop();
                 var i = 0;
                 var found = false;
@@ -1384,7 +1475,6 @@ window.interpretBrevity = (function () {
             else
                 result += format[i];
         }
-        var end = new Date();
         return result;
     }
 
@@ -1395,9 +1485,9 @@ window.interpretBrevity = (function () {
     return interpret;
 })();
 
-const allBrevityChars =
+const allParChars =
     '\n !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~' +
-    '¡¦§«¬²»½÷˄˅˦˨Σπ‖•″‴ⁿ₁₂↑↓↔↕↨∫≠≤≥⌐┐┘╞╡▼◄◊☺♦✶';
+    '¡¦§«¬²·»½÷˄˅˦˨Σπ‖″‴ⁿ₁₂↑↓↔↕↨∫≠≤≥⌐┐┘╞╡▼◄◊●◘◙☺♦✶';
 
 const arities = {
     '\n': 1,
@@ -1444,7 +1534,9 @@ const arities = {
     's': 3,
     't': 1,
     'u': 1,
+    '{': 202,
     '|': 2,
+    '}': 202,
     '~': 1,
     '¡': 101,
     '¦': 1,
@@ -1462,7 +1554,6 @@ const arities = {
     'Σ': 1,
     'π': 0,
     '‖': 1,
-    '•': 201,
     '″': 101,
     '‴': 101,
     'ⁿ': 2,
@@ -1483,6 +1574,9 @@ const arities = {
     '▼': 201,
     '◄': 0,
     '◊': 200,
+    '●': 201,
+    '◘': 1,
+    '◙': 1,
     '☺': 1,
     '♦': 200,
     '✶': 101
