@@ -6,11 +6,12 @@
     <script src="par.js"></script>
     <script src="docs.js"></script>
     <script src="test.js"></script>
+    <script src="analysis.js"></script>
     <title>Par</title>
 </head>
 <body>
     <div style="width: 50%; float: left">
-        <h1>Par Interpreter</h1>
+        <h1><a href="https://github.com/Ypnypn/Par/" style="text-decoration: none; color: #00007f">Par</a> Interpreter</h1>
         <div style="width: 50%; float: left">
             <h2>Code - <span id="size">0 bytes</span></h2>
         </div>
@@ -38,6 +39,8 @@
                 <tbody></tbody>
             </table>
         </div>
+        <div id="analysis">
+        </div>
     </div>
     <footer>
         <p>
@@ -55,6 +58,7 @@
 
             try {
                 updateCodeSize();
+                analyzeCode();
             } catch (e) { }
 
             try {
@@ -104,7 +108,28 @@
             } catch (e) {
             }
 
-            setInterval(updateCodeSize(), 200);
+            setInterval(updateCodeSize, 200);
+
+            function fit(text, padding, size) {
+                if (size >= text.length)
+                    return text + padding.repeat(size - text.length);
+                else
+                    return text.substring(0, size - 5) + '...' + text.substring(text.length - 2);
+            }
+            function analyzeCode() {
+                if (!window.analyze)
+                    return false;
+
+                const code = $("#code").val();
+                const analysis = analyzePar(code);
+                $("#analysis").html('<pre></pre>');
+                analysis.forEach(line => {
+                    $("#analysis pre").append(`${fit(line[0], ' ', 13)}  ## ${line[1]}\n`);
+                });
+                return true;
+            }
+
+            setInterval(analyzeCode, 1000);
 
             $("#run").prop("disabled", false);
             $("#run").click(function () {
@@ -206,7 +231,7 @@
             border: 1px black solid;
         }
 
-        code {
+        pre, code {
             font-family: Consolas, monspace;
             background-color: #DDDDDD;
         }
@@ -227,7 +252,7 @@
         }
 
         footer {
-            clear: both;
+            clear: left;
             padding: 20px;
         }
     </style>

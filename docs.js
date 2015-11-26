@@ -1,5 +1,4 @@
 ﻿const documentation = {
-
     '\n': {
         '?': 'Print and keep `a`'
     },
@@ -11,6 +10,8 @@
     '%': {
         'nn': '`a` modulo `b`',
         'sn': '`a` split into substrings of length `b`',
+        'ss': '`a` split by regular expression `b`',
+        'sa': '`a` with each `·` replaced by an element of `b`',
         'an': '`a` split into sub-arrays of length `b`',
         'as': 'Time represented by `a`, formatted with `b`',
         'aa': 'Matrix `a` completed with `b`'
@@ -227,7 +228,7 @@
         '': 'Variable (initialized to space)'
     },
     '{': {
-        '??': 'Map `a` with left-parameter `b`'
+        '??': 'Map `b` with left-parameter `a`'
     },
     '|': {
         'nn': 'Bitwise-or of `a` and `b`',
@@ -264,6 +265,9 @@
         's': 'Cartesian product of `a` and itself',
         'a': 'Cartesian product of `a` and itself'
     },
+    '´': {
+        '': 'Map with left-parameter'
+    },
     '·': {
         '': 'Immutable, or map with right-parameter'
     },
@@ -276,6 +280,9 @@
         'n': '`a` divided by two',
         's': 'Medians of `a`',
         'a': 'Medians of `a`'
+    },
+    '÷': {
+        'nn': '`a` divided by `b`'
     },
     '˄': {
         '?': 'If `a` is false, leave on stack; otherwise, execute'
@@ -294,6 +301,8 @@
         'a?': 'Last index of `b` in `a`',
     },
     'Σ': {
+        'n': '`a` in binary',
+        's': '`a`, treated as binary',
         'a': 'Sum of elements of `a`'
     },
     'π': {
@@ -309,6 +318,11 @@
     '‴': {
         '?': 'Three copies of `a`'
     },
+    '⁞': {
+        'n': 'Execute `a` times',
+        's': 'Map `a` with iteration',
+        'a': 'Map `a` with iteration'
+    },
     'ⁿ': {
         'nn': '`a` to the power of `b`',
         'sn': '`b`-ary cartesian power of `a`',
@@ -319,6 +333,12 @@
     },
     '₂': {
         '': 'If preceded by a numeral, begin a new number starting with 2; otherwise, remove second-to-top of stack'
+    },
+    '⅓': {
+        '???': '`c`, then `a`, then `b`'
+    },
+    '⅔': {
+        '???': '`b`, then `c`, then `a`'
     },
     '↑': {
         'n': '`a` plus one',

@@ -41,6 +41,7 @@ window.interpretPar = (function () {
         const isSub = !!options.isSub;
 
         // Parse
+        code = code.replace(/  ##[^\n]*(\n|$)/, ' ');
         code = code.replace(/K/g, 'K)');
 
         const forwards = {};
@@ -102,17 +103,34 @@ window.interpretPar = (function () {
                         }
                     }
                     stack.push(str);
-                } else if (ch === '·') {
+                } else if (ch === '·' || ch === '´' || (ch === '.' && (sub[i + 1] <= '0' || sub[i + 1] >= '9'))) {
                     i++;
-                    var next = sub[i];
+                    const next = sub[i];
                     const arity = arities[next];
-                    if (arity === 1) {
-                        const arg = stack.length !== 0 ? stack.pop() : chars['l']();
-                        stack.push(+(compare(arg, chars[next](arg)) === 0));
-                    } else if (arity === 2) {
-                        const arg2 = stack.pop();
-                        const arg1 = stack.pop();
-                        stack.push([...iterate(arg1)].map(e => chars[next](e, arg2)));
+                    if (ch === '.') {
+                        if (arity === 1) {
+                            const arg = stack.length !== 0 ? stack.pop() : chars['l']();
+                            stack.push([...iterate(arg)].map(chars[next]));
+                        } else if (arity === 2) {
+                            const arg2 = [...iterate(stack.pop())];
+                            const arg1 = [...iterate(stack.pop())];
+                            stack.push(arg1.map((e, k) => chars[next](e, arg2[k % arg2.length])));
+                        }
+                    } else if (ch === '·') {
+                        if (arity === 1) {
+                            const arg = stack.length !== 0 ? stack.pop() : chars['l']();
+                            stack.push(+(compare(arg, chars[next](arg)) === 0));
+                        } else if (arity === 2) {
+                            const arg2 = stack.pop();
+                            const arg1 = stack.pop();
+                            stack.push([...iterate(arg1)].map(e => chars[next](e, arg2)));
+                        }
+                    } else if (ch === '´') {
+                        if (arity === 2) {
+                            const arg2 = stack.pop();
+                            const arg1 = stack.pop();
+                            stack.push([...iterate(arg2)].map(e => chars[next](arg1, e)));
+                        }
                     }
                 } else if (ch === '-' && (i === 0 || sub[i - 1] === ' ') && (sub[i + 1] >= '1' && sub[i + 1] <= '9')) {
                     var j = i;
@@ -132,17 +150,6 @@ window.interpretPar = (function () {
                         while (sub[j] >= '0' && sub[j] <= '9');
                         stack.push(+sub.substring(i, j));
                         i = j - 1;
-                    } else {
-                        i++;
-                        const arity = arities[next];
-                        if (arity === 1) {
-                            const arg = stack.length !== 0 ? stack.pop() : chars['l']();
-                            stack.push([...iterate(arg)].map(chars[next]));
-                        } else if (arity === 2) {
-                            const arg2 = [...iterate(stack.pop())];
-                            const arg1 = [...iterate(stack.pop())];
-                            stack.push(arg1.map((e,k) => chars[next](e, arg2[k % arg2.length])));
-                        }
                     }
                 } else if (ch === '0') {
                     stack.push(0);
@@ -224,6 +231,12 @@ window.interpretPar = (function () {
                         const arg1 = stack.pop();
                         const result = chars[ch](arg1, arg2, arg3);
                         stack.push(result);
+                    } else if (arity === 103) {
+                        const arg3 = stack.pop();
+                        const arg2 = stack.pop();
+                        const arg1 = stack.pop();
+                        const result = chars[ch](arg1, arg2, arg3);
+                        stack.push(...result);
                     } else {
                         throw new Error(`unrecognized symbol: '${ch}'`);
                     }
@@ -270,13 +283,24 @@ window.interpretPar = (function () {
                 }
             },
             '%': function (a, b) {
-                if (typeof a === 'number' && typeof b === 'number')
+                if (typeof a === 'number' && typeof b === 'number') {
                     return a % b;
+                }
                 if (typeof a === 'string' && typeof b === 'number') {
                     var arr = Array(Math.ceil(a.length / b));
                     for (var ind = 0; ind < arr.length; ind++)
                         arr[ind] = a.substring(ind * b, (ind + 1) * b);
                     return arr;
+                }
+                if (typeof a === 'string' && typeof b === 'string') {
+                    return a.split(RegExp(b));
+                }
+                if (typeof a === 'string' && Array.isArray(b)) {
+                    var pieces = a.split('·');
+                    var res = '';
+                    for (var k = 0; k < pieces.length - 1; k++)
+                        res += pieces[k] + b[k % b.length];
+                    return res + pieces[pieces.length - 1];
                 }
                 if (Array.isArray(a) && typeof b === 'number') {
                     var arr = Array(Math.ceil(a.length / b));
@@ -594,6 +618,7 @@ window.interpretPar = (function () {
                         res.push(e);
                     return res;
                 }
+
                 if (Array.isArray(a))
                     return flatten(a);
             },
@@ -756,13 +781,13 @@ window.interpretPar = (function () {
                     else
                         return c.slice(stop + 1, start + 1).reverse();
                 }
-                if (typeof a === 'string' && typeof b === 'string' && typeof c === 'string') {
-                    return b.split(a).join(c);
-                }
                 if (typeof a === 'string' && typeof b === 'number') {
                     var size = a.length;
                     var index = (b % size + size) % size;
                     return a.substring(0, index) + c + a.substring(index + 1);
+                }
+                if (typeof a === 'string' && typeof b === 'string' && typeof c === 'string') {
+                    return b.split(a).join(c);
                 }
                 if (Array.isArray(a) && typeof b === 'number') {
                     var size = a.length;
@@ -935,6 +960,10 @@ window.interpretPar = (function () {
                     return a.length - a.reverse().findIndex(e => typeof e === typeof b && compare(e, b) === 0) - 1;
             },
             'Σ': function (a) {
+                if (typeof a === 'number')
+                    return a.toString(2);
+                if (typeof a === 'string')
+                    return parseInt(a, 2);
                 if (Array.isArray(a))
                     return a.reduce(chars['+']);
             },
@@ -985,6 +1014,12 @@ window.interpretPar = (function () {
                     }
                     return ret;
                 }
+            },
+            '⅓': function (a, b, c) {
+                return [c, a, b];
+            },
+            '⅔': function (a, b, c) {
+                return [b, c, a];
             },
             '↑': function (a) {
                 if (typeof a === 'number')
@@ -1203,7 +1238,7 @@ window.interpretPar = (function () {
             }
         };
 
-        var forwardChars = {
+        const forwardChars = {
             '(': function (go) {
                 var stackSize = stack.length;
                 go();
@@ -1255,8 +1290,8 @@ window.interpretPar = (function () {
                 stack.push(result);
             },
             '{': function (go) {
-                const leftParam = stack.pop();
                 const arg = iterate(stack.pop());
+                const leftParam = stack.pop();
                 var i = 0;
                 try {
                     for (var e of arg) {
@@ -1317,6 +1352,45 @@ window.interpretPar = (function () {
                 else
                     stack.push(arg);
             },
+            '⁞': function (go) {
+                var arg = stack.pop();
+                if (typeof arg === 'number') {
+                    for (var i = 0; i < arg; i++) {
+                        try {
+                            go();
+                        } catch (e) {
+                            if (!(e instanceof BreakLoop))
+                                throw e;
+                        }
+                    }
+                } else {
+                    var i = 0;
+                    try {
+                        for (var e of arg) {
+                            stack.push(e);
+                            stack.push(i);
+                            go();
+                            i++;
+                        }
+                    } catch (e) {
+                        if (!(e instanceof BreakLoop))
+                            throw e;
+                    }
+                    var result = stack.splice(stack.length - i, i);
+                    stack.push(result);
+                }
+            },
+            '∫': function (go) {
+                var arg = stack.pop();
+                var arr = [...iterate(arg)];
+                if (arr.length !== 0) {
+                    stack.push(arr[0]);
+                    for (var item of arr.slice(1)) {
+                        stack.push(item);
+                        go();
+                    }
+                }
+            },
             '●': function (go) {
                 var arg = stack.pop();
                 var i = 0;
@@ -1333,17 +1407,6 @@ window.interpretPar = (function () {
                 }
                 if (!found)
                     stack.push(-1);
-            },
-            '∫': function (go) {
-                var arg = stack.pop();
-                var arr = [...iterate(arg)];
-                if (arr.length !== 0) {
-                    stack.push(arr[0]);
-                    for (var item of arr.slice(1)) {
-                        stack.push(item);
-                        go();
-                    }
-                }
             },
             '▼': function (go) {
                 var arg = stack.pop();
@@ -1394,7 +1457,6 @@ window.interpretPar = (function () {
             if (isSub || !(e instanceof ProgramOver))
                 throw e;
         }
-
 
         return [stack, output];
     }
@@ -1487,7 +1549,7 @@ window.interpretPar = (function () {
 
 const allParChars =
     '\n !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~' +
-    '¡¦§«¬²·»½÷˄˅˦˨Σπ‖″‴ⁿ₁₂↑↓↔↕↨∫≠≤≥⌐┐┘╞╡▼◄◊●◘◙☺♦✶';
+    '¡¦§«¬²´·»½÷˄˅˦˨Σπ‖″‴⁞ⁿ₁₂⅓⅔↑↓↔↕↨∫≠≤≥⌐┐┘╞╡▼◄◊●◘◙☺♦✶';
 
 const arities = {
     '\n': 1,
@@ -1556,7 +1618,10 @@ const arities = {
     '‖': 1,
     '″': 101,
     '‴': 101,
+    '⁞': 201,
     'ⁿ': 2,
+    '⅓': 103,
+    '⅔': 103,
     '↑': 1,
     '↓': 1,
     '↔': 102,
@@ -1585,5 +1650,7 @@ const arities = {
 function stringify(val) {
     if (Array.isArray(val))
         return '(' + val.map(stringify).join(' ') + ')';
+    if (typeof val === 'number' && val > -1 && val < 1)
+        return (val + '').replace('0.', '.');
     return val + '';
 }
